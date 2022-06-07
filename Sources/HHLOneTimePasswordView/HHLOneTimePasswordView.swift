@@ -30,26 +30,26 @@ import UIKit
 ///     recognisedCallback(true)
 /// }
 /// ```
-struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
+public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     
     /// Controls the corner radius of each individual "box". Default is 8.
-    let cornerRadius: CGFloat
+    public let cornerRadius: CGFloat
     
     /// Controls how many digits should be entered by the user. Default is 4.
-    let digitCount: Int
+    public let digitCount: Int
     
     /// Controls the color of the character in the input boxes. Default is `UIColor.label`
-    let foregroundColor: Color
+    public let foregroundColor: Color
     
     /// Controls the color of the background of the input boxes. Default is `UIColor.systemGroupedBackground`
-    let backgroundColor: Color
+    public let backgroundColor: Color
     
     /// A set that determines which inputs from the user should be accepted and which should be ignored.
     /// Default is `.decimalDigits`
-    let allowedCharacterSet: CharacterSet
+    public let allowedCharacterSet: CharacterSet
     
     /// A closure that gives you the ability to react to the user input, after all boxes are filled in.
-    let passwordEnteredHandler: (_ enteredCharacters: [Character],
+    public let passwordEnteredHandler: (_ enteredCharacters: [Character],
                   _ inputCorrectCallback: @escaping (_ inputIsCorrect: Bool) -> ()
     ) -> ()
     
@@ -97,7 +97,7 @@ struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     ///   - placeholder: View builder used to provide a placeholder appearance for when there is no
     /// entered character by the user in an input box.
     ///   - passwordEnteredHandler: A closure that gives you the ability to react to the user input, after all boxes are filled in.
-    init(cornerRadius: CGFloat =  8,
+    public init(cornerRadius: CGFloat =  8,
          digitCount: Int =  4,
          foregroundColor: Color = Color(uiColor: .label),
          backgroundColor: Color = Color(uiColor: .systemGroupedBackground),
@@ -118,7 +118,7 @@ struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
         self.placeholder = placeholder
     }
     
-    var body: some View {
+    public var body: some View {
         ZStack {
             inputGathering
                 .focused($inputFieldFocus)
