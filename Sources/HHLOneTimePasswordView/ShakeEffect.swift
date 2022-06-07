@@ -28,11 +28,11 @@ struct ShakeEffect: GeometryEffect {
     ///
     /// - Parameters:
     ///   - shakes: The number of shakes that you want performed. Default value is 1.
-    ///   - translation: The horizontal distance at which the "shaked" view should be moved
+    ///   - offset: The horizontal distance at which the "shaked" view should be moved
     ///   - speed: The speed at which the "shaked" view should be moved
-    init(shakes: Int = 1, translation: CGFloat = 6, speed: CGFloat = 4) {
+    init(shakes: Int = 1, offset: CGFloat = 6, speed: CGFloat = 4) {
         animatableData = CGFloat(shakes)
-        self.offset = translation
+        self.offset = offset
         self.speed = speed
     }
     
