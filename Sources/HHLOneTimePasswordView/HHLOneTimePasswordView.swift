@@ -94,6 +94,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     /// Default is `.decimalDigits`
     ///   - highlightBorderColor: Controls the color of the border for the highlighted input box. Default value is `UIColor.label`
     ///   - borderColor: Controls the color of the border for the non highlighted input boxes. Default value is `UIColor.systemGray4`
+    ///   - inputFieldFocus: Gives you the ability to control the focus of this view (to become/resign being first responder).
     ///   - placeholder: View builder used to provide a placeholder appearance for when there is no
     /// entered character by the user in an input box.
     ///   - passwordEnteredHandler: A closure that gives you the ability to react to the user input, after all boxes are filled in.
@@ -104,6 +105,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
                 allowedCharacterSet: CharacterSet = .decimalDigits,
                 highlightBorderColor: Color = Color(uiColor: .label),
                 borderColor: Color = Color(uiColor: .systemGray4),
+                inputFieldFocus: FocusState<Bool> = FocusState(),
                 @ViewBuilder placeholder: @escaping () -> Placeholder,
                 passwordEnteredHandler: @escaping ([Character], @escaping (Bool) -> ()) -> ()) {
         
@@ -114,6 +116,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
         self.allowedCharacterSet = allowedCharacterSet
         self._highlightBorderColor = State(initialValue: highlightBorderColor)
         self._borderColor = State(initialValue: borderColor)
+        self._inputFieldFocus = inputFieldFocus
         self.passwordEnteredHandler = passwordEnteredHandler
         self.placeholder = placeholder
     }
@@ -147,6 +150,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     /// Default is `.decimalDigits`
     ///   - highlightBorderColor: Controls the color of the border for the highlighted input box. Default value is `UIColor.label`
     ///   - borderColor: Controls the color of the border for the non highlighted input boxes. Default value is `UIColor.systemGray4`
+    ///   - inputFieldFocus: Gives you the ability to control the focus of this view (to become/resign being first responder).
     ///   - placeholder: Pass a View used to provide a placeholder appearance for when there is no
     /// entered character by the user in an input box.
     ///   - passwordEnteredHandler: A closure that gives you the ability to react to the user input, after all boxes are filled in.
@@ -157,6 +161,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
                 allowedCharacterSet: CharacterSet = .decimalDigits,
                 highlightBorderColor: Color = Color(uiColor: .label),
                 borderColor: Color = Color(uiColor: .systemGray4),
+                inputFieldFocus: FocusState<Bool> = FocusState(),
                 placeholder: Placeholder,
                 passwordEnteredHandler: @escaping ([Character], @escaping (Bool) -> ()) -> ()) {
         
@@ -167,6 +172,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
         self.allowedCharacterSet = allowedCharacterSet
         self._highlightBorderColor = State(initialValue: highlightBorderColor)
         self._borderColor = State(initialValue: borderColor)
+        self._inputFieldFocus = inputFieldFocus
         self.passwordEnteredHandler = passwordEnteredHandler
         self.placeholder = { placeholder }
     }
