@@ -184,11 +184,11 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
             presentation
                 .modifier(ShakeEffect(shakes: shouldShake ? 1 : 0))
         }
-        .padding()
         .disabled(isDisabled)
         .opacity(isDisabled ? 0.7 : 1)
         .onTapGesture {
             inputFieldFocus = true
+            typedCharacters = []
         }
     }
 }
@@ -248,10 +248,10 @@ extension OneTimePasswordView {
         inputFieldFocus = false
         
         passwordEnteredHandler(typedCharacters) { isSuccess in
-            guard isSuccess == false else { return }
             withAnimation {
-                typedCharacters = []
                 isDisabled = false
+                guard isSuccess == false else { return }
+                typedCharacters = []
                 inputFieldFocus = true
                 shouldShake.toggle()
             }
