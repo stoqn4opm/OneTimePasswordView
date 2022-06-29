@@ -24,7 +24,7 @@ import UIKit
 ///     Circle()
 ///         .fill(Color.brown)
 ///         .padding()
-/// } passwordEnteredHandler: { enteredCode, recognisedCallback in
+/// } onSubmit: { enteredCode, recognisedCallback in
 ///     // check if enteredCode is correct and pass true or false to `recognisedCallback`
 ///     // indicating whether it was recognised or not
 ///     recognisedCallback(true)
@@ -48,8 +48,12 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     /// Default is `.decimalDigits`
     public let allowedCharacterSet: CharacterSet
     
+    /// A closure that is executed when the text input changes. You can check how many characters are allowed,
+    /// by checking the value in `digitCount`.
+    public let onChange: (([Character]) -> ())?
+    
     /// A closure that gives you the ability to react to the user input, after all boxes are filled in.
-    public let passwordEnteredHandler: (_ enteredCharacters: [Character],
+    public let onSubmit: (_ enteredCharacters: [Character],
                                         _ inputCorrectCallback: @escaping (_ inputIsCorrect: Bool) -> ()
     ) -> ()
     
@@ -78,7 +82,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     ///     Circle()
     ///         .fill(Color.brown)
     ///         .padding()
-    /// } passwordEnteredHandler: { enteredCode, recognisedCallback in
+    /// } onSubmit: { enteredCode, recognisedCallback in
     ///     // check if enteredCode is correct and pass true or false to `recognisedCallback`
     ///     // indicating whether it was recognised or not
     ///     recognisedCallback(true)
@@ -91,13 +95,15 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     ///   - foregroundColor: Controls the color of the character in the input boxes. Default is `UIColor.label`
     ///   - backgroundColor: Controls the color of the background of the input boxes. Default is `UIColor.systemGroupedBackground`
     ///   - allowedCharacterSet: A set that determines which inputs from the user should be accepted and which should be ignored.
-    /// Default is `.decimalDigits`
+    ///     Default is `.decimalDigits`
     ///   - highlightBorderColor: Controls the color of the border for the highlighted input box. Default value is `UIColor.label`
     ///   - borderColor: Controls the color of the border for the non highlighted input boxes. Default value is `UIColor.systemGray4`
     ///   - inputFieldFocus: Gives you the ability to control the focus of this view (to become/resign being first responder).
     ///   - placeholder: View builder used to provide a placeholder appearance for when there is no
-    /// entered character by the user in an input box.
-    ///   - passwordEnteredHandler: A closure that gives you the ability to react to the user input, after all boxes are filled in.
+    ///     entered character by the user in an input box.
+    ///   - onSubmit: A closure that gives you the ability to react to the user input, after all boxes are filled in.
+    ///   - onChange: A closure that is executed when the text input changes. You can check how many characters are allowed,
+    ///     by checking the value in `digitCount`.
     public init(cornerRadius: CGFloat =  8,
                 digitCount: Int =  4,
                 foregroundColor: Color = Color(uiColor: .label),
@@ -107,7 +113,8 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
                 borderColor: Color = Color(uiColor: .systemGray4),
                 inputFieldFocus: FocusState<Bool> = FocusState(),
                 @ViewBuilder placeholder: @escaping () -> Placeholder,
-                passwordEnteredHandler: @escaping ([Character], @escaping (Bool) -> ()) -> ()) {
+                onChange: (([Character]) -> ())? = nil,
+                onSubmit: @escaping ([Character], @escaping (Bool) -> ()) -> ()) {
         
         self.cornerRadius = cornerRadius
         self.digitCount = digitCount
@@ -117,7 +124,8 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
         self._highlightBorderColor = State(initialValue: highlightBorderColor)
         self._borderColor = State(initialValue: borderColor)
         self._inputFieldFocus = inputFieldFocus
-        self.passwordEnteredHandler = passwordEnteredHandler
+        self.onChange = onChange
+        self.onSubmit = onSubmit
         self.placeholder = placeholder
     }
     
@@ -147,13 +155,15 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     ///   - foregroundColor: Controls the color of the character in the input boxes. Default is `UIColor.label`
     ///   - backgroundColor: Controls the color of the background of the input boxes. Default is `UIColor.systemGroupedBackground`
     ///   - allowedCharacterSet: A set that determines which inputs from the user should be accepted and which should be ignored.
-    /// Default is `.decimalDigits`
+    ///     Default is `.decimalDigits`
     ///   - highlightBorderColor: Controls the color of the border for the highlighted input box. Default value is `UIColor.label`
     ///   - borderColor: Controls the color of the border for the non highlighted input boxes. Default value is `UIColor.systemGray4`
     ///   - inputFieldFocus: Gives you the ability to control the focus of this view (to become/resign being first responder).
     ///   - placeholder: Pass a View used to provide a placeholder appearance for when there is no
-    /// entered character by the user in an input box.
-    ///   - passwordEnteredHandler: A closure that gives you the ability to react to the user input, after all boxes are filled in.
+    ///     entered character by the user in an input box.
+    ///   - onSubmit: A closure that gives you the ability to react to the user input, after all boxes are filled in.
+    ///   - onChange: A closure that is executed when the text input changes. You can check how many characters are allowed,
+    ///     by checking the value in `digitCount`.
     public init(cornerRadius: CGFloat =  8,
                 digitCount: Int =  4,
                 foregroundColor: Color = Color(uiColor: .label),
@@ -163,7 +173,8 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
                 borderColor: Color = Color(uiColor: .systemGray4),
                 inputFieldFocus: FocusState<Bool> = FocusState(),
                 placeholder: Placeholder,
-                passwordEnteredHandler: @escaping ([Character], @escaping (Bool) -> ()) -> ()) {
+                onChange: (([Character]) -> ())? = nil,
+                onSubmit: @escaping ([Character], @escaping (Bool) -> ()) -> ()) {
         
         self.cornerRadius = cornerRadius
         self.digitCount = digitCount
@@ -173,7 +184,8 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
         self._highlightBorderColor = State(initialValue: highlightBorderColor)
         self._borderColor = State(initialValue: borderColor)
         self._inputFieldFocus = inputFieldFocus
-        self.passwordEnteredHandler = passwordEnteredHandler
+        self.onChange = onChange
+        self.onSubmit = onSubmit
         self.placeholder = { placeholder }
     }
     
@@ -235,6 +247,9 @@ extension OneTimePasswordView {
             .foregroundColor(.clear)
             .keyboardType(.numberPad)
             .textContentType(.oneTimeCode)
+            .onChange(of: characterBinding.wrappedValue) { newValue in
+                onChange?(Array(newValue))
+            }
     }
 }
 
@@ -247,7 +262,7 @@ extension OneTimePasswordView {
         isDisabled = true
         inputFieldFocus = false
         
-        passwordEnteredHandler(typedCharacters) { isSuccess in
+        onSubmit(typedCharacters) { isSuccess in
             withAnimation {
                 isDisabled = false
                 guard isSuccess == false else { return }
@@ -286,7 +301,7 @@ struct OneTimePasswordView_Previews: PreviewProvider {
             Circle()
                 .fill(Color.brown)
                 .padding()
-        } passwordEnteredHandler: { enteredCode, recognisedCallback in
+        } onSubmit: { enteredCode, recognisedCallback in
             recognisedCallback(true)
         }
     }

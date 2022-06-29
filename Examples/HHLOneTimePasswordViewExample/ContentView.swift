@@ -13,7 +13,8 @@ struct ContentView: View {
     
     var body: some View {
         OneTimePasswordView(placeholder: placeholderAppearance,
-                            passwordEnteredHandler: recognise)
+                            onChange: charactersChanged(_:),
+                            onSubmit: recognise(_:_:))
         .frame(maxWidth: .infinity, maxHeight: 100, alignment: .center)
     }
     
@@ -25,7 +26,11 @@ struct ContentView: View {
         )
     }
     
-    func recognise(_ enteredCharacters: [Character], _ inputCorrectCallback: @escaping (_ inputIsCorrect: Bool) -> ()) {
+    private func charactersChanged(_ enteredCharacters: [Character]) {
+        print("characters changed: \(enteredCharacters)")
+    }
+    
+    private func recognise(_ enteredCharacters: [Character], _ inputCorrectCallback: @escaping (_ inputIsCorrect: Bool) -> ()) {
         
         // simulating an async check
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
