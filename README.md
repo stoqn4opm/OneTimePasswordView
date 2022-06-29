@@ -7,6 +7,7 @@ The component gives the developer the ability to:
 - change its appearace by providing colors
 - provide a placeholder view for boxes that are not filled in
 - provide a character set of allowed characters, so that the user can't type in(paste) a character that is not valid
+- provide an `onChange` closure, that allows you to execute code as user input changes.
 
 Build using Swift 5.6.1, XCode 13.4, supports iOS 15.0+
 
@@ -33,9 +34,7 @@ You can use **HHLOneTimePasswordView** like any other SwiftUI view, by invoking 
 ### Full form of constructor:
 
 ```swift
-public struct OneTimePasswordView<Placeholder> : View where Placeholder : View {
-
-    /// Creates a SwiftUI view, meant to accept one time passwords sends to the user
+/// Creates a SwiftUI view, meant to accept one time passwords sends to the user
     /// for authentication.
     ///
     /// It can be configured with a set with allowed characters and with
@@ -48,22 +47,26 @@ public struct OneTimePasswordView<Placeholder> : View where Placeholder : View {
     ///   - foregroundColor: Controls the color of the character in the input boxes. Default is `UIColor.label`
     ///   - backgroundColor: Controls the color of the background of the input boxes. Default is `UIColor.systemGroupedBackground`
     ///   - allowedCharacterSet: A set that determines which inputs from the user should be accepted and which should be ignored.
-    /// Default is `.decimalDigits`
+    ///     Default is `.decimalDigits`
     ///   - highlightBorderColor: Controls the color of the border for the highlighted input box. Default value is `UIColor.label`
     ///   - borderColor: Controls the color of the border for the non highlighted input boxes. Default value is `UIColor.systemGray4`
+    ///   - inputFieldFocus: Gives you the ability to control the focus of this view (to become/resign being first responder).
     ///   - placeholder: View builder used to provide a placeholder appearance for when there is no
-    /// entered character by the user in an input box.
-    ///   - passwordEnteredHandler: A closure that gives you the ability to react to the user input, after all boxes are filled in.
-    public init(cornerRadius: CGFloat = 8,
-                digitCount: Int = 4,
+    ///     entered character by the user in an input box.
+    ///   - onSubmit: A closure that gives you the ability to react to the user input, after all boxes are filled in.
+    ///   - onChange: A closure that is executed when the text input changes. You can check how many characters are allowed,
+    ///     by checking the value in `digitCount`.
+    public init(cornerRadius: CGFloat =  8,
+                digitCount: Int =  4,
                 foregroundColor: Color = Color(uiColor: .label),
                 backgroundColor: Color = Color(uiColor: .systemGroupedBackground),
                 allowedCharacterSet: CharacterSet = .decimalDigits,
                 highlightBorderColor: Color = Color(uiColor: .label),
                 borderColor: Color = Color(uiColor: .systemGray4),
+                inputFieldFocus: FocusState<Bool> = FocusState(),
                 @ViewBuilder placeholder: @escaping () -> Placeholder,
-                passwordEnteredHandler: @escaping ([Character], @escaping (Bool) -> ()) -> ())
-}
+                onChange: (([Character]) -> ())? = nil,
+                onSubmit: @escaping ([Character], @escaping (Bool) -> ()) -> ())
 ```
 
 *If you need more info, have a look at the example project inside "Examples" folder in the repo.*
