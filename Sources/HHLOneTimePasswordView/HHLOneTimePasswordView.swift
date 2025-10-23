@@ -65,7 +65,6 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     @State private var shouldShake = false
     
     @FocusState private var inputFieldFocus: Bool
-    @Namespace private var otpBorderNamespace
     
     @ViewBuilder private var placeholder: () -> Placeholder
     
@@ -208,28 +207,21 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
 // MARK: - Components
 
 extension OneTimePasswordView {
-    
+
     private var presentation: some View {
-        HStack {
-            ForEach(0..<digitCount, id: \.self) { index in
-                DigitView(cornerRadius: cornerRadius,
-                          foregroundColor: foregroundColor,
-                          backgroundColor: backgroundColor,
-                          digit: character(for: index),
-                          borderColor: $borderColor,
-                          placeholder: placeholder)
-                .overlay {
-                    if typedCharacters.indices.endIndex == index && inputFieldFocus {
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .stroke(highlightBorderColor, lineWidth: 3)
-                            .matchedGeometryEffect(id: "otp-border", in: otpBorderNamespace)
-                    }
-                }
-                .animation(.bouncy, value: typedCharacters)
-            }
-        }
+        PresentationView(
+            cornerRadius: cornerRadius,
+            digitCount: digitCount,
+            foregroundColor: foregroundColor,
+            backgroundColor: backgroundColor,
+            highlightBorderColor: highlightBorderColor,
+            inputFieldFocus: inputFieldFocus,
+            borderColor: borderColor,
+            placeholder: placeholder,
+            typedCharacters: $typedCharacters
+        )
     }
-    
+
     private var inputGathering: some View {
         let characterBinding = Binding<String> {
             String(typedCharacters)
@@ -279,17 +271,6 @@ extension OneTimePasswordView {
                 shouldShake.toggle()
             }
         }
-    }
-}
-
-// MARK: - Helpers
-
-extension OneTimePasswordView {
-    
-    private func character(for index: Int) -> Binding<Character?> {
-        guard typedCharacters.indices.contains(index) else { return .constant(nil) }
-        let character = $typedCharacters[index]
-        return Binding<Character?>(character)
     }
 }
 
