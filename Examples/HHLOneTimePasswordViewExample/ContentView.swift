@@ -12,10 +12,18 @@ import HHLOneTimePasswordView
 struct ContentView: View {
     
     var body: some View {
-        OneTimePasswordView(placeholder: placeholderAppearance,
-                            onChange: charactersChanged(_:),
-                            onSubmit: recognise(_:_:))
-        .frame(maxWidth: .infinity, maxHeight: 100, alignment: .center)
+        GeometryReader { reader in
+            VStack {
+                Spacer()
+                OneTimePasswordView(digitCount: 5,
+                                    placeholder: placeholderAppearance,
+                                    onChange: charactersChanged(_:),
+                                    onSubmit: recognise(_:_:))
+                .frame(maxWidth: .infinity, maxHeight: (reader.size.width / 5) - 10, alignment: .center)
+                .padding(.horizontal)
+                Spacer()
+            }
+        }
     }
     
     @ViewBuilder func placeholderAppearance() -> AnyView {
