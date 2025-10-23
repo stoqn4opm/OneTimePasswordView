@@ -117,7 +117,7 @@ extension PresentationView {
         static var defaultValue: [Int : CGRect] { [:] }
         
         static func reduce(value: inout [Int: CGRect], nextValue: () -> [Int: CGRect]) {
-            value.merge(nextValue(), uniquingKeysWith: { $1 })
+            value.merge(nextValue()) { $1 }
         }
     }
 }

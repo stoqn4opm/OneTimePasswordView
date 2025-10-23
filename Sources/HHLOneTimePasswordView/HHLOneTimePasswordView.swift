@@ -54,7 +54,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     
     /// A closure that gives you the ability to react to the user input, after all boxes are filled in.
     public let onSubmit: (_ enteredCharacters: [Character],
-                                        _ inputCorrectCallback: @escaping (_ inputIsCorrect: Bool) -> ()
+                          _ inputCorrectCallback: @escaping (_ inputIsCorrect: Bool) -> ()
     ) -> ()
     
     
@@ -64,8 +64,8 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     @State private var borderColor: Color
     @State private var shouldShake = false
     
+    private let pasteboardAccessor: () -> String?
     @FocusState private var inputFieldFocus: Bool
-    
     @ViewBuilder private var placeholder: () -> Placeholder
     
     
@@ -111,6 +111,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
                 allowedCharacterSet: CharacterSet = .decimalDigits,
                 highlightBorderColor: Color = Color(uiColor: .label),
                 borderColor: Color = Color(uiColor: .systemGray4),
+                pasteboardAccessor: @escaping () -> String? = { UIPasteboard.general.string },
                 inputFieldFocus: FocusState<Bool> = FocusState(),
                 @ViewBuilder placeholder: @escaping () -> Placeholder,
                 onChange: (([Character]) -> ())? = nil,
@@ -123,6 +124,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
         self.allowedCharacterSet = allowedCharacterSet
         self._highlightBorderColor = State(initialValue: highlightBorderColor)
         self._borderColor = State(initialValue: borderColor)
+        self.pasteboardAccessor = pasteboardAccessor
         self._inputFieldFocus = inputFieldFocus
         self.onChange = onChange
         self.onSubmit = onSubmit
@@ -171,6 +173,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
                 allowedCharacterSet: CharacterSet = .decimalDigits,
                 highlightBorderColor: Color = Color(uiColor: .label),
                 borderColor: Color = Color(uiColor: .systemGray4),
+                pasteboardAccessor: @escaping () -> String? = { UIPasteboard.general.string },
                 inputFieldFocus: FocusState<Bool> = FocusState(),
                 placeholder: Placeholder,
                 onChange: (([Character]) -> ())? = nil,
@@ -182,6 +185,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
                   allowedCharacterSet: allowedCharacterSet,
                   highlightBorderColor: highlightBorderColor,
                   borderColor: borderColor,
+                  pasteboardAccessor: pasteboardAccessor,
                   inputFieldFocus: inputFieldFocus,
                   placeholder: { placeholder },
                   onChange: onChange,
@@ -201,13 +205,15 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
             inputFieldFocus = true
             typedCharacters = []
         }
+        .padding(3)
+        .contextMenu(menuItems: pasteContextMenu)
     }
 }
 
 // MARK: - Components
 
 extension OneTimePasswordView {
-
+    
     private var presentation: some View {
         PresentationView(
             cornerRadius: cornerRadius,
@@ -218,10 +224,9 @@ extension OneTimePasswordView {
             inputFieldFocus: inputFieldFocus,
             borderColor: borderColor,
             placeholder: placeholder,
-            typedCharacters: $typedCharacters
-        )
+            typedCharacters: $typedCharacters)
     }
-
+    
     private var inputGathering: some View {
         let characterBinding = Binding<String> {
             String(typedCharacters)
@@ -247,9 +252,25 @@ extension OneTimePasswordView {
             .foregroundColor(.clear)
             .keyboardType(.numberPad)
             .textContentType(.oneTimeCode)
+            .frame(width: 0, height: 0)
             .onChange(of: characterBinding.wrappedValue) { newValue in
                 onChange?(Array(newValue))
             }
+    }
+    
+    @ViewBuilder private func pasteContextMenu() -> some View {
+        if let raw = pasteboardAccessor(), raw.isEmpty == false {
+            Button("Paste", systemImage: "document.on.clipboard.fill") {
+                var input = String(raw)
+                input.unicodeScalars.removeAll { scalar in
+                    allowedCharacterSet.contains(scalar) == false
+                }
+                let trimmedChars = Array(input.prefix(digitCount))
+                guard trimmedChars.isEmpty == false else { return }
+                typedCharacters = trimmedChars
+                submitCode()
+            }
+        }
     }
 }
 
@@ -289,3 +310,4 @@ struct OneTimePasswordView_Previews: PreviewProvider {
 }
 
 #endif
+
