@@ -65,6 +65,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     @State private var shouldShake = false
     
     @FocusState private var inputFieldFocus: Bool
+    @Namespace private var otpBorderNamespace
     
     @ViewBuilder private var placeholder: () -> Placeholder
     
@@ -175,18 +176,17 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
                 placeholder: Placeholder,
                 onChange: (([Character]) -> ())? = nil,
                 onSubmit: @escaping ([Character], @escaping (Bool) -> ()) -> ()) {
-        
-        self.cornerRadius = cornerRadius
-        self.digitCount = digitCount
-        self.foregroundColor = foregroundColor
-        self.backgroundColor = backgroundColor
-        self.allowedCharacterSet = allowedCharacterSet
-        self._highlightBorderColor = State(initialValue: highlightBorderColor)
-        self._borderColor = State(initialValue: borderColor)
-        self._inputFieldFocus = inputFieldFocus
-        self.onChange = onChange
-        self.onSubmit = onSubmit
-        self.placeholder = { placeholder }
+        self.init(cornerRadius: cornerRadius,
+                  digitCount: digitCount,
+                  foregroundColor: foregroundColor,
+                  backgroundColor: backgroundColor,
+                  allowedCharacterSet: allowedCharacterSet,
+                  highlightBorderColor: highlightBorderColor,
+                  borderColor: borderColor,
+                  inputFieldFocus: inputFieldFocus,
+                  placeholder: { placeholder },
+                  onChange: onChange,
+                  onSubmit: onSubmit)
     }
     
     public var body: some View {
@@ -216,8 +216,16 @@ extension OneTimePasswordView {
                           foregroundColor: foregroundColor,
                           backgroundColor: backgroundColor,
                           digit: character(for: index),
-                          borderColor: borderColor(forDigitAtIndex: index),
+                          borderColor: $borderColor,
                           placeholder: placeholder)
+                .overlay {
+                    if typedCharacters.indices.endIndex == index && inputFieldFocus {
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .stroke(highlightBorderColor, lineWidth: 3)
+                            .matchedGeometryEffect(id: "otp-border", in: otpBorderNamespace)
+                    }
+                }
+                .animation(.bouncy, value: typedCharacters)
             }
         }
     }
@@ -282,14 +290,6 @@ extension OneTimePasswordView {
         guard typedCharacters.indices.contains(index) else { return .constant(nil) }
         let character = $typedCharacters[index]
         return Binding<Character?>(character)
-    }
-    
-    private func borderColor(forDigitAtIndex index: Int) -> Binding<Color> {
-        if typedCharacters.indices.endIndex == index && inputFieldFocus {
-            return $highlightBorderColor
-        } else {
-            return $borderColor
-        }
     }
 }
 
