@@ -8,7 +8,7 @@
 import XCTest
 import SwiftUI
 import CoreGraphics
-@testable import HHLOneTimePasswordView
+@testable import OneTimePasswordView
 
 final class ShakeEffectTests: XCTestCase {
     

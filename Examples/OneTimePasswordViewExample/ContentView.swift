@@ -1,13 +1,13 @@
 //
 //  ContentView.swift
-//  HHLOneTimePasswordViewExample
+//  OneTimePasswordViewExample
 //
 //  Created by Stoyan Stoyanov on 07/06/22.
 //
 
 import Foundation
 import SwiftUI
-import HHLOneTimePasswordView
+import OneTimePasswordView
 
 struct ContentView: View {
     

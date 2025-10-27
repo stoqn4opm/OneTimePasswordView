@@ -1,6 +1,6 @@
 //
 //  PresentationView.swift
-//  HHLOneTimePasswordView
+//  OneTimePasswordView
 //
 //  Created by stoyan on 23.10.25.
 //

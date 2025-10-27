@@ -71,11 +71,11 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     
     /// Creates a SwiftUI view, meant to accept one time passwords sends to the user
     /// for authentication.
-    ///
+    /// 
     /// It can be configured with a set with allowed characters and with
     /// characters count, as well as with a few UI tweaks, that you can inject
     /// from the constructor.
-    ///
+    /// 
     /// Example usage:
     /// ```swift
     /// OneTimePasswordView {
@@ -88,7 +88,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     ///     recognisedCallback(true)
     /// }
     /// ```
-    ///
+    /// 
     /// - Parameters:
     ///   - cornerRadius: Controls the corner radius of each individual "box". Default is 8.
     ///   - digitCount: Controls how many digits should be entered by the user. Default is 4.
@@ -98,6 +98,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     ///     Default is `.decimalDigits`
     ///   - highlightBorderColor: Controls the color of the border for the highlighted input box. Default value is `UIColor.label`
     ///   - borderColor: Controls the color of the border for the non highlighted input boxes. Default value is `UIColor.systemGray4`
+    ///   - pasteboardAccessor: provides a closure meant to return the pasteboard content
     ///   - inputFieldFocus: Gives you the ability to control the focus of this view (to become/resign being first responder).
     ///   - placeholder: View builder used to provide a placeholder appearance for when there is no
     ///     entered character by the user in an input box.
@@ -160,6 +161,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     ///     Default is `.decimalDigits`
     ///   - highlightBorderColor: Controls the color of the border for the highlighted input box. Default value is `UIColor.label`
     ///   - borderColor: Controls the color of the border for the non highlighted input boxes. Default value is `UIColor.systemGray4`
+    ///   - pasteboardAccessor: provides a closure meant to return the pasteboard content
     ///   - inputFieldFocus: Gives you the ability to control the focus of this view (to become/resign being first responder).
     ///   - placeholder: Pass a View used to provide a placeholder appearance for when there is no
     ///     entered character by the user in an input box.
