@@ -283,7 +283,8 @@ extension OneTimePasswordView {
 extension OneTimePasswordView {
     
     private func submitCode() {
-        guard typedCharacters.count == digitCount else { return }
+        guard isDisabled == false,
+              typedCharacters.count == digitCount else { return }
         isDisabled = true
         effectiveFocus.wrappedValue = false
         
