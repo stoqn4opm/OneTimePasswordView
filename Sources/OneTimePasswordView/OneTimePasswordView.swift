@@ -254,7 +254,7 @@ extension OneTimePasswordView {
             }
             .accentColor(.clear)
             .foregroundColor(.clear)
-            .keyboardType(.numberPad)
+            .keyboardType(allowedCharacterSet == .decimalDigits ? .numberPad : .default)
             .textContentType(.oneTimeCode)
             .frame(width: 1, height: 1)
             .onChange(of: characterBinding.wrappedValue) { newValue in
