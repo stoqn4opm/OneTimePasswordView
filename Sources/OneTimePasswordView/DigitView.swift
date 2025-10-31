@@ -75,10 +75,6 @@ struct DigitView<Placeholder>: View where Placeholder: View {
     var body: some View {
         RoundedRectangle(cornerRadius: cornerRadius)
             .stroke(borderColor, lineWidth: borderWidth)
-            .background(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(backgroundColor)
-            )
             .overlay(alignment: .center) {
                 if let digit = digit {
                     Text(String(digit))
@@ -87,6 +83,7 @@ struct DigitView<Placeholder>: View where Placeholder: View {
                     placeholder()
                 }
             }
+            .glassyEffect(.clear.tint(backgroundColor), in: RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
 

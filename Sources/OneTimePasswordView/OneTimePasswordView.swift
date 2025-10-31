@@ -65,7 +65,9 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     @State private var shouldShake = false
     
     private let pasteboardAccessor: () -> String?
-    @FocusState private var inputFieldFocus: Bool
+    @FocusState private var internalFocus: Bool
+    private var externalInputFieldFocus: FocusState<Bool>.Binding?
+    private var effectiveFocus: FocusState<Bool>.Binding { externalInputFieldFocus ?? $internalFocus }
     @ViewBuilder private var placeholder: () -> Placeholder
     
     
@@ -113,7 +115,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
                 highlightBorderColor: Color = Color(uiColor: .label),
                 borderColor: Color = Color(uiColor: .systemGray4),
                 pasteboardAccessor: @escaping () -> String? = { UIPasteboard.general.string },
-                inputFieldFocus: FocusState<Bool> = FocusState(),
+                inputFieldFocus: FocusState<Bool>.Binding? = nil,
                 @ViewBuilder placeholder: @escaping () -> Placeholder,
                 onChange: (([Character]) -> ())? = nil,
                 onSubmit: @escaping ([Character], @escaping (Bool) -> ()) -> ()) {
@@ -126,7 +128,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
         self._highlightBorderColor = State(initialValue: highlightBorderColor)
         self._borderColor = State(initialValue: borderColor)
         self.pasteboardAccessor = pasteboardAccessor
-        self._inputFieldFocus = inputFieldFocus
+        self.externalInputFieldFocus = inputFieldFocus
         self.onChange = onChange
         self.onSubmit = onSubmit
         self.placeholder = placeholder
@@ -176,7 +178,7 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
                 highlightBorderColor: Color = Color(uiColor: .label),
                 borderColor: Color = Color(uiColor: .systemGray4),
                 pasteboardAccessor: @escaping () -> String? = { UIPasteboard.general.string },
-                inputFieldFocus: FocusState<Bool> = FocusState(),
+                inputFieldFocus: FocusState<Bool>.Binding? = nil,
                 placeholder: Placeholder,
                 onChange: (([Character]) -> ())? = nil,
                 onSubmit: @escaping ([Character], @escaping (Bool) -> ()) -> ()) {
@@ -197,14 +199,14 @@ public struct OneTimePasswordView<Placeholder>: View where Placeholder: View {
     public var body: some View {
         ZStack {
             inputGathering
-                .focused($inputFieldFocus)
+                .focused(effectiveFocus)
             presentation
                 .modifier(ShakeEffect(shakes: shouldShake ? 1 : 0))
         }
         .disabled(isDisabled)
         .opacity(isDisabled ? 0.7 : 1)
         .onTapGesture {
-            inputFieldFocus = true
+            effectiveFocus.wrappedValue = true
             typedCharacters = []
         }
         .padding(3)
@@ -223,7 +225,7 @@ extension OneTimePasswordView {
             foregroundColor: foregroundColor,
             backgroundColor: backgroundColor,
             highlightBorderColor: highlightBorderColor,
-            inputFieldFocus: inputFieldFocus,
+            inputFieldFocus: effectiveFocus.wrappedValue,
             borderColor: borderColor,
             placeholder: placeholder,
             typedCharacters: $typedCharacters)
@@ -254,7 +256,7 @@ extension OneTimePasswordView {
             .foregroundColor(.clear)
             .keyboardType(.numberPad)
             .textContentType(.oneTimeCode)
-            .frame(width: 0, height: 0)
+            .frame(width: 1, height: 1)
             .onChange(of: characterBinding.wrappedValue) { newValue in
                 onChange?(Array(newValue))
             }
@@ -283,14 +285,14 @@ extension OneTimePasswordView {
     private func submitCode() {
         guard typedCharacters.count == digitCount else { return }
         isDisabled = true
-        inputFieldFocus = false
+        effectiveFocus.wrappedValue = false
         
         onSubmit(typedCharacters) { isSuccess in
             withAnimation {
                 isDisabled = false
                 guard isSuccess == false else { return }
                 typedCharacters = []
-                inputFieldFocus = true
+                effectiveFocus.wrappedValue = true
                 shouldShake.toggle()
             }
         }
